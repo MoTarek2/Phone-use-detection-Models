@@ -60,9 +60,3 @@ Deep learning models for image classification are strictly bound by their traini
 4. **Camera Angles (Overfitting):** The models are fit to the specific right-dashboard camera angle of the training set. Moving the camera to the rearview mirror or the left pillar will drastically drop accuracy to near-random guessing.
 5. **Demographic Bias:** The dataset features a very limited pool of 26 unique drivers. If this pool lacks diversity, the model's feature extraction (like gaze direction or skin contrast) will perform poorly on underrepresented demographics.
 6. **Vehicle/Layout Bias:** The dataset consists exclusively of Left-Hand Drive (LHD) vehicles. The model inherently expects the driver on the left side of the frame. Deploying this in a Right-Hand Drive (RHD) vehicle will cause catastrophic failure unless the input feeds are flipped horizontally during preprocessing.
-
----
-## 👨‍💻 Author
-**Mohamed Tarek**
-* [GitHub](YOUR_GITHUB_URL)
-* [LinkedIn](YOUR_LINKEDIN_URL)
