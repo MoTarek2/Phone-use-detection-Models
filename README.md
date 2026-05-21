@@ -10,7 +10,7 @@ This project is a computer vision pipeline developed for an artificial intellige
 2. **Texting** (Right/Left hand)
 3. **Calling** (Right/Left hand)
 
-This repository contains two different modeling approaches—**EfficientNetB2** and **MobileNetV2**—allowing for a comparison between high-accuracy feature extraction and lightweight, edge-optimized performance. This project also serves as a technical demonstration for professional freelance AI and computer vision development.
+This repository contains two different modeling approaches—**EfficientNetB2** and **MobileNetV2**—allowing for a comparison between high-accuracy feature extraction and lightweight, edge-optimized performance. This project also serves as a technical demonstration for professional AI and computer vision development.
 
 ---
 
@@ -40,23 +40,29 @@ The models are trained using the [State Farm Distracted Driver Detection dataset
 ## ⏱️ Time and Space Complexity
 
 ### Time Complexity
-* **Training:** Bound by $O(E \times B \times F)$, where $E$ is epochs, $B$ is the number of batches, and $F$ is the forward/backward pass time of the base architecture. MobileNetV2 processes epochs significantly faster than EfficientNetB2.
-* **Inference:** $O(1)$ per image. MobileNetV2 is optimized for fast, real-time inference, whereas EfficientNetB2 carries higher computational latency per frame.
+* **Training:** Bound by O(E × B × F), where E is epochs, B is the number of batches, and F is the forward/backward pass time of the base architecture. MobileNetV2 processes epochs significantly faster than EfficientNetB2.
+* **Inference:** O(1) per image. MobileNetV2 is optimized for fast, real-time inference, whereas EfficientNetB2 carries higher computational latency per frame.
 
-### Space Complexity & Flaws
+### Space Complexity & Known Bottlenecks
 * **EfficientNetB2:** Space complexity is primarily dictated by the model weights (~9M parameters) and standard batch-loading memory overhead.
-* **MobileNetV2 (Critical Flaw):** The current implementation in the notebook loads the *entire* training and validation dataset into RAM simultaneously as NumPy arrays using `np.concatenate`. Even using `float16` at 192x192 resolution, this $O(N \times W \times H \times C)$ approach is highly memory-inefficient and frankly a terrible way to handle large image datasets. It will cause severe Out-Of-Memory (OOM) errors on standard machines. 
-  * *Required Fix:* The data pipeline must be rewritten to use `tf.data.Dataset` or `ImageDataGenerator` for disk-to-batch loading, which will reduce memory complexity to $O(\text{Batch\_Size})$.
+* **MobileNetV2 (Memory Bottleneck):** The current implementation in the notebook loads the *entire* training and validation dataset into RAM simultaneously as NumPy arrays using `np.concatenate`. Even using `float16` at 192x192 resolution, this O(N × W × H × C) approach is highly memory-inefficient and will cause severe Out-Of-Memory (OOM) errors on machines with limited RAM. 
+  * *Future Optimization:* Rewrite the data pipeline to use `tf.data.Dataset` or `ImageDataGenerator` for disk-to-batch loading, which will reduce memory complexity to O(Batch_Size).
 
 ---
 
 ## ⚠️ Limitations, Failure Cases & Bias
 
-Deep learning models for image classification are strictly bound by their training distributions. In a real-world deployment, this system has significant vulnerabilities:
+Deep learning models for image classification are strictly bound by their training distributions. In a real-world deployment, this system has specific vulnerabilities:
 
 1. **Occlusion:** If the driver's hand or the phone is blocked by the steering wheel or a passenger, the model will struggle to differentiate between holding a phone and resting an empty hand.
 2. **Lighting Conditions:** The models will fail entirely during night driving, under harsh glare, or in tunnels, as the dataset only contains well-lit daytime images.
 3. **Class Confusion:** A driver scratching their ear, resting their head on their hand, or looking down at their lap will likely trigger false positives for "Calling" or "Texting" due to the similar spatial geometry.
-4. **Camera Angles (Severe Overfitting):** The models are heavily over-fit to the specific right-dashboard camera angle of the training set. Moving the camera to the rearview mirror or the left pillar will drastically drop accuracy to near-random guessing.
+4. **Camera Angles (Overfitting):** The models are fit to the specific right-dashboard camera angle of the training set. Moving the camera to the rearview mirror or the left pillar will drastically drop accuracy to near-random guessing.
 5. **Demographic Bias:** The dataset features a very limited pool of 26 unique drivers. If this pool lacks diversity, the model's feature extraction (like gaze direction or skin contrast) will perform poorly on underrepresented demographics.
 6. **Vehicle/Layout Bias:** The dataset consists exclusively of Left-Hand Drive (LHD) vehicles. The model inherently expects the driver on the left side of the frame. Deploying this in a Right-Hand Drive (RHD) vehicle will cause catastrophic failure unless the input feeds are flipped horizontally during preprocessing.
+
+---
+## 👨‍💻 Author
+**Mohamed Tarek**
+* [GitHub](YOUR_GITHUB_URL)
+* [LinkedIn](YOUR_LINKEDIN_URL)
